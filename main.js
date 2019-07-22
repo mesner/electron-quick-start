@@ -11,14 +11,20 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: true,
+    resizable: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      sandbox: false
     }
   })
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
-
+  //mainWindow.loadURL('http://127.0.0.1:8080/index.html')
+  
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
