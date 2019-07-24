@@ -28,10 +28,20 @@ window.addEventListener('load', () => {
 	var onmousedown = function(e) {
     offset = [e.clientX, e.clientY];
     electron.ipcRenderer.send("start-moving", offset);
+  };
+  
+
+	var onmousedownPoll = function(e) {
+    offset = [e.clientX, e.clientY];
+    electron.ipcRenderer.send("start-moving-poll", offset);
 	};
 
   var element = document.getElementById('draggable-main');
 	element.addEventListener('mousedown', onmousedown);
+
+
+  var element = document.getElementById('draggable-main-poll');
+	element.addEventListener('mousedown', onmousedownPoll);
 
   let mouseX, mouseY, animationId;
 

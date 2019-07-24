@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const electron = require('electron');
+const {app, BrowserWindow, ipcMain} = electron;
 const path = require('path');
 
 
@@ -54,11 +55,28 @@ mouse.on('left-drag', function(x, y) {
 
 mouse.on('left-up', function() {
   offset = null;
+  clearInterval(moveInterval);
 });
 
 ipcMain.on("start-moving", (e, data) => {
-  console.log(e);
+  console.log("start-moving");
   offset = data;
+});
+
+let moveInterval;
+ipcMain.on("start-moving-poll", (e, data) => {
+  console.log("start-moving-poll");
+  let pollingOffset = data;
+
+  moveInterval = setInterval(function() {
+    
+    let { x, y } = electron.screen.getCursorScreenPoint()
+  
+    x = Math.round(x - pollingOffset[0]);
+    y = Math.round(y - pollingOffset[1]);
+    
+    mainWindow.setPosition(x, y);
+  },0);
 });
 
 // This method will be called when Electron has finished
