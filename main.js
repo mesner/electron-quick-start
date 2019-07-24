@@ -4,7 +4,7 @@ const {app, BrowserWindow, ipcMain} = electron;
 const path = require('path');
 
 
-var mouseConstructor = require('osx-mouse');
+const ioHook = require('iohook');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -41,22 +41,44 @@ function createWindow () {
   })
 }
 
-let mouse = mouseConstructor();
+//let mouse = mouseConstructor();
 let offset;
 
-mouse.on('left-drag', function(x, y) {
+ioHook.on('mousedrag', event => {
+  let {x, y, button} = event;
+
   if(!offset) return;
 
   x = Math.round(x - offset[0]);
   y = Math.round(y - offset[1]);
   
   mainWindow.setPosition(x, y);
+
+  //console.log(event); // { type: 'mousemove', x: 700, y: 400 }
 });
 
-mouse.on('left-up', function() {
+
+ioHook.on('mouseup', event => {
   offset = null;
   clearInterval(moveInterval);
 });
+
+// Register and start hook
+ioHook.start();
+
+// mouse.on('left-drag', function(x, y) {
+//   if(!offset) return;
+
+//   x = Math.round(x - offset[0]);
+//   y = Math.round(y - offset[1]);
+  
+//   mainWindow.setPosition(x, y);
+// });
+
+// mouse.on('left-up', function() {
+//   offset = null;
+//   clearInterval(moveInterval);
+// });
 
 ipcMain.on("start-moving", (e, data) => {
   console.log("start-moving");
