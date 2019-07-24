@@ -22,7 +22,16 @@ window.addEventListener('load', () => {
 
   // Pass a query selector or a dom element to the function.
   // Dragging the element will drag the whole window.
+  
   var clear = drag('#draggable');
+
+	var onmousedown = function(e) {
+    offset = [e.clientX, e.clientY];
+    electron.ipcRenderer.send("start-moving", offset);
+	};
+
+  var element = document.getElementById('draggable-main');
+	element.addEventListener('mousedown', onmousedown);
 
   let mouseX, mouseY, animationId;
 

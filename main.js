@@ -1,6 +1,9 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
-const path = require('path')
+const {app, BrowserWindow, ipcMain} = require('electron')
+const path = require('path');
+
+
+var mouseConstructor = require('osx-mouse');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -11,7 +14,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    frame: true,
+    frame: false,
     resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -36,6 +39,27 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+let mouse = mouseConstructor();
+let offset;
+
+mouse.on('left-drag', function(x, y) {
+  if(!offset) return;
+
+  x = Math.round(x - offset[0]);
+  y = Math.round(y - offset[1]);
+  
+  mainWindow.setPosition(x, y);
+});
+
+mouse.on('left-up', function() {
+  offset = null;
+});
+
+ipcMain.on("start-moving", (e, data) => {
+  console.log(e);
+  offset = data;
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
