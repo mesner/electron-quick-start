@@ -2,18 +2,32 @@
 const electron = require('electron');
 const {app, BrowserWindow, ipcMain} = electron;
 const path = require('path');
+const util = require('util')
 
 
 var mouseConstructor = require('osx-mouse');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow, childWindow;
 
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 400,
+    height: 600,
+    frame: false,
+    resizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      sandbox: false
+    }
+  })
+
+  childWindow = new BrowserWindow({
+    width: 400,
     height: 600,
     frame: false,
     resizable: false,
@@ -26,9 +40,11 @@ function createWindow () {
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-  //mainWindow.loadURL('http://127.0.0.1:8080/index.html')
-  
+  //mainWindow.loadFile('index.html')
+  mainWindow.loadURL('http://127.0.0.1:8080/index.html')
+  childWindow.loadURL('http://127.0.0.1:8080/index.html')
+
+
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
@@ -41,6 +57,17 @@ function createWindow () {
   })
 }
 
+electron.ipcMain.on('move-window-js', (e, data)=> {
+  const { mouseX, mouseY} = data;
+  const { x, y } = electron.screen.getCursorScreenPoint()
+  console.dir(data, { depth: null })
+  mainWindow.setPosition(x - mouseX, y - mouseY)
+
+  let bounds = mainWindow.getBounds();
+
+  childWindow.setPosition(x - mouseX + bounds.width, y - mouseY);
+})
+
 let mouse = mouseConstructor();
 let offset;
 
@@ -51,6 +78,11 @@ mouse.on('left-drag', function(x, y) {
   y = Math.round(y - offset[1]);
   
   mainWindow.setPosition(x, y);
+  
+  let bounds = mainWindow.getBounds();
+
+
+  childWindow.setPosition(x + bounds.width, y)
 });
 
 mouse.on('left-up', function() {
@@ -76,6 +108,13 @@ ipcMain.on("start-moving-poll", (e, data) => {
     y = Math.round(y - pollingOffset[1]);
     
     mainWindow.setPosition(x, y);
+
+    // let bounds = mainWindow.getBounds();
+    // let pos = {
+    //   x: bounds.x + mainWindow.width,
+    //   y: bounds.y
+    // }
+    
   },0);
 });
 

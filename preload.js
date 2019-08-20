@@ -58,8 +58,9 @@ window.addEventListener('load', () => {
   }
 
   let moveWindow = () => {
-		const { x, y } = electron.remote.screen.getCursorScreenPoint()
-    electron.remote.getCurrentWindow().setPosition(x - mouseX, y - mouseY)
+    electron.ipcRenderer.send('move-window-js', {mouseX, mouseY});
+		// const { x, y } = electron.remote.screen.getCursorScreenPoint()
+    // electron.remote.getCurrentWindow().setPosition(x - mouseX, y - mouseY)
 		animationId = requestAnimationFrame(moveWindow);
 	}
 
