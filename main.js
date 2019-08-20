@@ -15,7 +15,7 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 600,
+    height: 400,
     frame: false,
     resizable: false,
     webPreferences: {
@@ -28,7 +28,33 @@ function createWindow () {
 
   childWindow = new BrowserWindow({
     width: 400,
-    height: 600,
+    height: 400,
+    frame: false,
+    resizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      sandbox: false
+    }
+  })
+
+  childWindow2 = new BrowserWindow({
+    width: 400,
+    height: 400,
+    frame: false,
+    resizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      sandbox: false
+    }
+  })
+
+  childWindow3= new BrowserWindow({
+    width: 400,
+    height: 400,
     frame: false,
     resizable: false,
     webPreferences: {
@@ -43,6 +69,8 @@ function createWindow () {
   //mainWindow.loadFile('index.html')
   mainWindow.loadURL('http://127.0.0.1:8080/index.html')
   childWindow.loadURL('http://127.0.0.1:8080/index.html')
+  childWindow2.loadURL('http://127.0.0.1:8080/index.html')
+  childWindow3.loadURL('http://127.0.0.1:8080/index.html')
 
 
   // Open the DevTools.
@@ -66,6 +94,8 @@ electron.ipcMain.on('move-window-js', (e, data)=> {
   let bounds = mainWindow.getBounds();
 
   childWindow.setPosition(x - mouseX + bounds.width, y - mouseY);
+  childWindow2.setPosition(x - mouseX, y - mouseY + bounds.height);
+  childWindow3.setPosition(x - mouseX + bounds.width, y - mouseY + bounds.height);
 })
 
 let mouse = mouseConstructor();
