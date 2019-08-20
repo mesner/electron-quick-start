@@ -5,7 +5,7 @@ const path = require('path');
 const util = require('util')
 
 
-var mouseConstructor = require('osx-mouse');
+//var mouseConstructor = require('osx-mouse');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -98,27 +98,27 @@ electron.ipcMain.on('move-window-js', (e, data)=> {
   childWindow3.setPosition(x - mouseX + bounds.width, y - mouseY + bounds.height);
 })
 
-let mouse = mouseConstructor();
+//let mouse = mouseConstructor();
 let offset;
 
-mouse.on('left-drag', function(x, y) {
-  if(!offset) return;
+// mouse.on('left-drag', function(x, y) {
+//   if(!offset) return;
 
-  x = Math.round(x - offset[0]);
-  y = Math.round(y - offset[1]);
+//   x = Math.round(x - offset[0]);
+//   y = Math.round(y - offset[1]);
   
-  mainWindow.setPosition(x, y);
+//   mainWindow.setPosition(x, y);
   
-  let bounds = mainWindow.getBounds();
+//   let bounds = mainWindow.getBounds();
 
 
-  childWindow.setPosition(x + bounds.width, y)
-});
+//   childWindow.setPosition(x + bounds.width, y)
+// });
 
-mouse.on('left-up', function() {
-  offset = null;
-  clearInterval(moveInterval);
-});
+// mouse.on('left-up', function() {
+//   offset = null;
+//   clearInterval(moveInterval);
+// });
 
 ipcMain.on("start-moving", (e, data) => {
   console.log("start-moving");
