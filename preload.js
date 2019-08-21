@@ -4,7 +4,7 @@
 
 var electron = require('electron')
 
-var drag = require('electron-drag');
+// var drag = require('electron-drag');
 
 
 // electron.remote.getCurrentWindow().webContents.executeJavaScript("alert('test eval in preload')")
@@ -23,7 +23,7 @@ window.addEventListener('load', () => {
   // Pass a query selector or a dom element to the function.
   // Dragging the element will drag the whole window.
   
-  var clear = drag('#draggable');
+  // var clear = drag('#draggable');
 
 	var onmousedown = function(e) {
     offset = [e.clientX, e.clientY];

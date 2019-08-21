@@ -88,14 +88,23 @@ function createWindow () {
 electron.ipcMain.on('move-window-js', (e, data)=> {
   const { mouseX, mouseY} = data;
   const { x, y } = electron.screen.getCursorScreenPoint()
-  console.dir(data, { depth: null })
-  mainWindow.setPosition(x - mouseX, y - mouseY)
-
+  // console.dir(`setting position to ${[x - mouseX, y - mouseY]}`)
+  
   let bounds = mainWindow.getBounds();
+  
+  console.dir(`current bounds ${[bounds.x, bounds.y, bounds.height, bounds.width]}`)
 
-  childWindow.setPosition(x - mouseX + bounds.width, y - mouseY);
-  childWindow2.setPosition(x - mouseX, y - mouseY + bounds.height);
-  childWindow3.setPosition(x - mouseX + bounds.width, y - mouseY + bounds.height);
+  mainWindow.setBounds({x:x - mouseX, y: y - mouseY, width: 400, height: 400})
+
+  // childWindow.setPosition(x - mouseX + bounds.width, y - mouseY);
+  childWindow.setBounds({x:x - mouseX + 400, y: y - mouseY, width: 400, height: 400})
+
+  // mainWindow.setBounds({x:x - mouseX, y: y - mouseY, width: 400, height: 400})
+  childWindow2.setBounds({x:x - mouseX, y: y - mouseY + 400, width: 400, height: 400})
+  // childWindow2.setPosition(x - mouseX, y - mouseY + bounds.height);
+
+  childWindow3.setBounds({x:x - mouseX + 400, y: y - mouseY + 400, width: 400, height: 400})
+  // childWindow3.setPosition(x - mouseX + bounds.width, y - mouseY + bounds.height);
 })
 
 //let mouse = mouseConstructor();
