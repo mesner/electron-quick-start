@@ -1,34 +1,55 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
+const {app, BrowserWindow} = electron
 const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow = {}
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+
+  let displays = electron.screen.getAllDisplays()
+  let maxMon = displays.sort((d1,d2)=>d1.width-d2.width)[displays.length-1];
+
+  for(var xi = maxMon.bounds.x; xi < maxMon.bounds.x + maxMon.bounds.width; xi += maxMon.bounds.width / 8 ) {
+    for(var yi = maxMon.bounds.y; yi < maxMon.bounds.y + maxMon.bounds.height; yi += maxMon.bounds.height / 8 ) {
+      console.log([xi,yi])
+      let mw = new BrowserWindow({
+        x:xi,
+        y:yi,
+        width: maxMon.bounds.width / 8,
+        height: maxMon.bounds.height / 8
+        ,
+        webPreferences: {
+          preload: path.join(__dirname, 'preload.js')
+        }
+      })
+
+      mw.loadURL('https://gizmodo.com/')
+
+      // Open the DevTools.
+      // mainWindow.webContents.openDevTools()
+
+      // Emitted when the window is closed.
+      mw.on('closed', function () {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mw = null
+      })
     }
-  })
+  }
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  // console.log(`w/h:${[maxMon.bounds.width / 8, maxMon.bounds.height / 8]}`)
+  // Create the browser window.
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+    electron.ipcMain.on('heartbeat', (e) => {
+      console.log(`heartbeat from id:${e.sender.id}`)
+      mainWindow[e.sender.id] = true
+    });
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+
 }
 
 // This method will be called when Electron has finished
