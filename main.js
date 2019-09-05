@@ -83,6 +83,31 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  mainWindow.on('will-move', function (e, newBounds) {
+
+
+    e.preventDefault();
+
+    let bounds = mainWindow.getBounds();
+    console.dir(`current bounds ${[bounds.x, bounds.y, bounds.height, bounds.width]}`)
+
+    bounds = newBounds;
+    console.dir(`newBounds ${[bounds.x, bounds.y, bounds.height, bounds.width]}`)
+
+    if(electron.screen.screenToDipRect){
+      bounds = Object.assign(bounds, electron.screen.screenToDipRect(null, bounds));
+      bounds.x = Math.round(bounds.x)
+      bounds.y = Math.round(bounds.y)
+    }
+
+    console.dir(`converted newBounds ${[bounds.x, bounds.y, bounds.height, bounds.width]}`)
+
+    mainWindow.setBounds({ x: bounds.x, y: bounds.y, width: 400, height: 400 })
+    childWindow.setBounds({ x: bounds.x + 400, y: bounds.y, width: 400, height: 400 })
+    childWindow2.setBounds({ x: bounds.x, y: bounds.y + 400, width: 400, height: 400 })
+    childWindow3.setBounds({ x: bounds.x + 400, y: bounds.y + 400, width: 400, height: 400 })
+  })
 }
 
 electron.ipcMain.on('move-window-js', (e, data)=> {
