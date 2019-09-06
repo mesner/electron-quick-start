@@ -43,9 +43,10 @@ window.addEventListener('load', () => {
   var element = document.getElementById('draggable-main-poll');
 	element.addEventListener('mousedown', onmousedownPoll);
 
-  let mouseX, mouseY, animationId;
+  let isMoving, mouseX, mouseY, animationId;
 
   let onMouseDown = (e) => {
+    isMoving = true;
 		mouseX = e.clientX;
 		mouseY = e.clientY;
 		document.addEventListener('mouseup', onMouseUp)
@@ -53,15 +54,18 @@ window.addEventListener('load', () => {
   }
 
   let onMouseUp = (e) => {
+      isMoving = false;
       document.removeEventListener('mouseup', onMouseUp)
       window.cancelAnimationFrame(animationId)
   }
 
   let moveWindow = () => {
-    electron.ipcRenderer.send('move-window-js', {mouseX, mouseY});
-		// const { x, y } = electron.remote.screen.getCursorScreenPoint()
-    // electron.remote.getCurrentWindow().setPosition(x - mouseX, y - mouseY)
-		animationId = requestAnimationFrame(moveWindow);
+    if(isMoving) {
+      electron.ipcRenderer.send('move-window-js', {mouseX, mouseY});
+      // const { x, y } = electron.remote.screen.getCursorScreenPoint()
+      // electron.remote.getCurrentWindow().setPosition(x - mouseX, y - mouseY)
+      animationId = requestAnimationFrame(moveWindow);
+    } else console.error("error moving window")
 	}
 
   let dragHandle = document.getElementById('draggablejs');
