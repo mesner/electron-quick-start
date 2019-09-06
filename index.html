@@ -5,6 +5,16 @@
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'file:///Users/imesner/Documents/projects/electron-quick-start/renderer.js'; child-src 'none'; object-src 'none'"> -->
     <title>Hello World!</title>
   </head>
+  <style>
+    div.draggable-div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+  </style>
   <body>
     
     <h1>Hello World!</h1>
@@ -19,9 +29,9 @@
 
     <div id="draggable-main-poll" style="width: 150px; height: 50px; border: 1px solid yellowgreen; cursor: hand;">OSX-MOUSE IN MAIN POLLING</div>
 
-    <div style="width: 150px; height: 50px; border:1px solid red; -webkit-app-region:drag ; cursor: hand;">-webkit-app-region</div>
+    <div style="width: 150px; height: 50px; border:1px solid red; -webkit-app-region:drag ; cursor: hand;" >-webkit-app-region</div>
     
-    <div id="draggablejs" style="width: 150px; height: 50px; border:1px solid blue; ; cursor: hand;">JS MOVEMENT</div>
+    <div id="draggablejs" style="width: 150px; height: 50px; border:1px solid blue; ; cursor: hand;" class="draggable-div">JS MOVEMENT</div>
     
   
     <!-- You can also require other files to run in this process -->
