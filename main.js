@@ -11,16 +11,19 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: false,
     webPreferences: {
+      sandbox: true,
       preload: path.join(__dirname, 'preload.js'),
       nativeWindowOpen: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      contextIsolation: true
     }
   })
 
   // and load the index.html of the app.
   //mainWindow.loadFile('index.html')
-  mainWindow.loadURL('http://localhost:8080')
+  mainWindow.loadURL('http://localhost:8080/index.html')
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
@@ -48,11 +51,13 @@ function createWindow () {
     event.preventDefault()
     event.newGuest = new BrowserWindow(options)
     let view = new BrowserView({webPreferences:{affinity: "browserview"}})
+    // let view = new BrowserView()
     event.newGuest.setBrowserView(view)
     console.log(`options`)
     console.dir(options, {depth:null})
     view.setBounds({ x: 0, y: 100, width: options.width, height: options.height - 100 })
-    view.webContents.loadURL('https://www.theworldsworstwebsiteever.com/');
+    view.webContents.loadURL('https://google.com');
+    // view.webContents.loadURL('about:blank');
   })
 }
 
