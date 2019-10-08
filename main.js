@@ -1,17 +1,24 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
 const path = require('path')
+const {app, BrowserWindow, ipcMain} = electron
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+let isWindowsOpen = false;
+let windowCounter = 0;
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 640,
     height: 600,
+    x:3840,
+    y:469,
     webPreferences: {
+      affinity: `win_${windowCounter++}`,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -29,7 +36,60 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  ipcMain.on('toggleWindows', ()=> {
+
+    if(isWindowsOpen){
+      isWindowsOpen = false;
+      for(let win of BrowserWindow.getAllWindows()){
+        if(win.id !== mainWindow.id) win.close();
+      }
+    } else {
+      isWindowsOpen = true;
+      for(let loc of getWindowLocs(2,3)){
+        let affinity = `win_${windowCounter++}`;
+        console.log(`opening window at ${Object.keys(loc)}`)
+        console.log(`opening window at ${Object.values(loc)}`)
+        let childWin = new BrowserWindow({
+          width: loc.width,
+          height: loc.height,
+          // x: loc.left,
+          // y: loc.top,
+          webPreferences: {
+            affinity: affinity
+          }
+        })
+        childWin.loadFile('welcome/welcome.html')
+      }
+    }
+  });
 }
+
+const getWindowLocs = (rows,cols) => {
+
+  let displays = electron.screen.getAllDisplays()
+  let externalDisplay = displays.find((display) => {
+    console.log(`${Object.keys(display.bounds)}`)
+    console.log(`${Object.values(display.bounds)}`)
+    return display.bounds.x !== 0 || display.bounds.y !== 0
+  })
+
+  const height = Math.floor(externalDisplay.bounds.height / rows);
+  const width = Math.floor(externalDisplay.bounds.width / cols);
+  
+  let windowLocs = [];
+  for(let i = 0; i < rows; i++){
+    for(let j = 0; j < cols; j++){
+      windowLocs.push({
+        top: externalDisplay.bounds.x + i * height,
+        left: externalDisplay.bounds.y + j * width,
+        width: width,
+        height: height
+      });
+    }
+  }
+  return windowLocs;
+} 
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
