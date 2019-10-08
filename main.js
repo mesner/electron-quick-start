@@ -53,8 +53,8 @@ function createWindow () {
         let childWin = new BrowserWindow({
           width: loc.width,
           height: loc.height,
-          // x: loc.left,
-          // y: loc.top,
+          x: 4440,
+          y: 469,
           webPreferences: {
             affinity: affinity
           }
