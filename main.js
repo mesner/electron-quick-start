@@ -10,13 +10,15 @@ let mainWindow
 let isWindowsOpen = false;
 let windowCounter = 0;
 
+global.preload = "http://localhost:3375/finsemble/FSBL.js"
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 640,
     height: 600,
-    x:3840,
-    y:469,
+    // x:3840,
+    // y:469,
     webPreferences: {
       affinity: `win_${windowCounter++}`,
       preload: path.join(__dirname, 'preload.js')
@@ -46,20 +48,24 @@ function createWindow () {
       }
     } else {
       isWindowsOpen = true;
-      for(let loc of getWindowLocs(2,3)){
+      for(let loc of getWindowLocs(1,2)){
         let affinity = `win_${windowCounter++}`;
         console.log(`opening window at ${Object.keys(loc)}`)
         console.log(`opening window at ${Object.values(loc)}`)
         let childWin = new BrowserWindow({
           width: loc.width,
           height: loc.height,
-          x: 4440,
-          y: 469,
+          x: loc.left,
+          y: loc.top,
           webPreferences: {
-            affinity: affinity
+            sandbox: true,
+            nodeIntegration: false,
+            affinity: affinity,
+            //preload: path.join(__dirname, 'e2o.js')
+            preload: 'C:/projects/finsemble-electron-adapter/dist/e2o.js'
           }
         })
-        childWin.loadFile('welcome/welcome.html')
+        childWin.loadURL('http://localhost:3375/components/welcome/welcome.html')
       }
     }
   });
@@ -71,7 +77,8 @@ const getWindowLocs = (rows,cols) => {
   let externalDisplay = displays.find((display) => {
     console.log(`${Object.keys(display.bounds)}`)
     console.log(`${Object.values(display.bounds)}`)
-    return display.bounds.x !== 0 || display.bounds.y !== 0
+    let isExternalDisplay = display.bounds.x !== 0 || display.bounds.y !== 0
+    return !isExternalDisplay
   })
 
   const height = Math.floor(externalDisplay.bounds.height / rows);
@@ -81,8 +88,8 @@ const getWindowLocs = (rows,cols) => {
   for(let i = 0; i < rows; i++){
     for(let j = 0; j < cols; j++){
       windowLocs.push({
-        top: externalDisplay.bounds.x + i * height,
-        left: externalDisplay.bounds.y + j * width,
+        top: externalDisplay.bounds.y + i * height,
+        left: externalDisplay.bounds.x + j * width,
         width: width,
         height: height
       });
