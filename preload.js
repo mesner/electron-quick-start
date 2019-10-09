@@ -1,6 +1,7 @@
-const process = require('process')
+const process2 = process//require('process')
 const electron = require('electron')
 const {ipcRenderer} = electron;
+const fs = require('fs')
 
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
@@ -11,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
   } 
   
   for (const type of ['chrome', 'node', 'electron']) {
-    replaceText(`${type}-version`, process.versions[type])
+    replaceText(`${type}-version`, process2.versions[type])
   }
 
   document.getElementById('launch').addEventListener('click', () => {
@@ -26,7 +27,7 @@ window.toggleWindows = () => {
 
 const onMemoryUpdate = () => {
   const element = document.getElementById('windows')
-  const {totalHeapSize, usedHeapSize} = process.getHeapStatistics()
+  const {totalHeapSize, usedHeapSize} = process2.getHeapStatistics()
   element.innerText =  `usedHeapSize ${usedHeapSize} totalHeapSize ${totalHeapSize} at ${new Date().toLocaleTimeString()}`
 }
 

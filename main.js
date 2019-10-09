@@ -48,7 +48,7 @@ function createWindow () {
       }
     } else {
       isWindowsOpen = true;
-      for(let loc of getWindowLocs(1,2)){
+      for(let loc of getWindowLocs(12,8)){
         let affinity = `win_${windowCounter++}`;
         console.log(`opening window at ${Object.keys(loc)}`)
         console.log(`opening window at ${Object.values(loc)}`)
@@ -61,8 +61,9 @@ function createWindow () {
             sandbox: true,
             nodeIntegration: false,
             affinity: affinity,
-            //preload: path.join(__dirname, 'e2o.js')
-            preload: 'C:/projects/finsemble-electron-adapter/dist/e2o.js'
+            //preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'e2o.js')
+            //preload: 'C:/projects/finsemble-electron-adapter/dist/e2o.js'
           }
         })
         childWin.loadURL('http://localhost:3375/components/welcome/welcome.html')
