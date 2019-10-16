@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 const electron = require('electron')
 const path = require('path')
-const {app, BrowserWindow, ipcMain} = electron
+const {app, BrowserWindow, ipcMain, globalShortcut, BrowserView} = electron
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -13,6 +13,19 @@ let windowCounter = 0;
 global.preload = "http://localhost:3375/finsemble/FSBL.js"
 
 function createWindow () {
+
+  // const ret = globalShortcut.register('CommandOrControl+A+F', () => {
+  //   console.log('CommandOrControl+A+F is pressed')
+  //   mainWindow.focus()
+  // })
+
+  // if (!ret) {
+  //   console.log('registration failed')
+  // }
+
+  // Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('CommandOrControl+A+F'))
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 640,
@@ -20,7 +33,7 @@ function createWindow () {
     // x:3840,
     // y:469,
     webPreferences: {
-      affinity: `win_${windowCounter++}`,
+      // affinity: `win_${windowCounter++}`,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -39,17 +52,54 @@ function createWindow () {
     mainWindow = null
   })
 
+  
+  // ipcMain.on('launchChild', (e, ...a)=> {
+    
+  //   const parentWindow = BrowserWindow.fromWebContents(e.sender);
+
+  //   console.dir(parentWindow.webContents,{depth:null})
+    
+  //   let childWin = new BrowserWindow({
+  //     width: 640,
+  //     height: 600,
+  //     parent: parentWindow,
+  //     webPreferences: {
+  //       // sandbox: true,
+  //       // nodeIntegration: false,
+  //       //preload: path.join(__dirname, 'preload.js')
+  //       //preload: path.join(__dirname, 'e2o.js')
+  //       preload: path.join(__dirname, 'preloadwelcome.js')
+  //       //preload: 'C:/projects/finsemble-electron-adapter/dist/e2o.js'
+  //     }
+  //   })
+
+  //   childWin.loadURL('http://localhost:8080/welcomechild/welcome.html')
+   
+  // });  
+
+  ipcMain.on('postMessage', (e, ...args)=> {
+    const win = BrowserWindow.fromBrowserView(BrowserView.fromWebContents(e.sender))
+    win.webContents.send("postMessage",args)
+  })
+
+  ipcMain.on('openChildDevTools', (e, ...args)=> {
+    const win = BrowserWindow.fromWebContents(e.sender);
+    const bview = win.getBrowserView();
+    bview.webContents.openDevTools();
+  })
+
+
   ipcMain.on('toggleWindows', ()=> {
 
-    if(isWindowsOpen){
+    // if(isWindowsOpen){
       isWindowsOpen = false;
       for(let win of BrowserWindow.getAllWindows()){
         if(win.id !== mainWindow.id) win.close();
       }
-    } else {
+    // } else {
       isWindowsOpen = true;
-      for(let loc of getWindowLocs(12,8)){
-        let affinity = `win_${windowCounter++}`;
+      let affinity = `win_${windowCounter++}`;
+      for(let loc of getWindowLocs(1,2)){
         console.log(`opening window at ${Object.keys(loc)}`)
         console.log(`opening window at ${Object.values(loc)}`)
         let childWin = new BrowserWindow({
@@ -58,17 +108,48 @@ function createWindow () {
           x: loc.left,
           y: loc.top,
           webPreferences: {
-            sandbox: true,
-            nodeIntegration: false,
-            affinity: affinity,
+            // sandbox: true,
+            // nodeIntegration: false,
+            // affinity: affinity,
             //preload: path.join(__dirname, 'preload.js')
-            preload: path.join(__dirname, 'e2o.js')
+            //preload: path.join(__dirname, 'e2o.js')
+            preload: path.join(__dirname, 'preloadwelcome.js')
             //preload: 'C:/projects/finsemble-electron-adapter/dist/e2o.js'
           }
         })
-        childWin.loadURL('http://localhost:3375/components/welcome/welcome.html')
+
+        childWin.webContents.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
+            // open window as modal
+            event.preventDefault()
+            Object.assign(options, {
+              width: 400,
+              height: 400,
+              webPreferences: Object.assign(options.webPreferences,{
+                preload: path.join(__dirname, 'preload.bw.js')
+              })
+            })
+            
+            event.newGuest = new BrowserWindow(options)
+            event.newGuest.loadURL('http://localhost:8080/index.html')
+            // event.newGuest.loadURL(url)
+                        
+            let view = new BrowserView({
+              webPreferences:{
+                preload: path.join(__dirname, 'preload.bv.js')
+              }})
+            event.newGuest.setBrowserView(view)
+            view.setBounds({ x: 0, y: 100, width: 400, height: 300 })
+            view.webContents.loadURL(url)
+
+
+            console.dir(event.newGuest,"{depth:null}")
+        })
+
+
+        childWin.loadURL('http://localhost:8080/welcome/welcome.html')
+        // childWin.loadURL('http://localhost:3375/dist/components/welcome/welcome.html')
       }
-    }
+    // }
   });
 }
 
@@ -115,6 +196,14 @@ app.on('activate', function () {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow()
+})
+
+app.on('will-quit', () => {
+  // Unregister a shortcut.
+  globalShortcut.unregister('CommandOrControl+A+F')
+
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll()
 })
 
 // In this file you can include the rest of your app's specific main process
