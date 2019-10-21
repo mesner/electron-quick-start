@@ -1,10 +1,15 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
 const path = require('path')
+const { spawn } = require('child_process');
+
+const { windowManager } = require("node-window-manager");
+ 
+const {app, BrowserWindow} = electron
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow, childnp
 
 function createWindow () {
   // Create the browser window.
@@ -28,6 +33,46 @@ function createWindow () {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
+  })
+
+  let cp = spawn("notepad.exe")
+  console.log(cp.pid)
+  let npwin;
+  
+  
+  mainWindow.on('move', function() {
+
+    if(!npwin) npwin = windowManager.getWindows().find(win => win.processId==cp.pid)
+    
+    
+    let mainWindowBounds = mainWindow.getBounds()
+    let mainWindowBoundsScreen = electron.screen.dipToScreenRect(mainWindow, mainWindowBounds)
+    let mainWindowMonitor = npwin.getMonitor()
+    let scaleFactor = windowManager.getScaleFactor(mainWindowMonitor)
+    
+    let npBounds = {
+      x: Math.round((mainWindowBoundsScreen.x + mainWindowBoundsScreen.width) / scaleFactor),
+      y: Math.round(mainWindowBoundsScreen.y / scaleFactor),
+      width: Math.round(mainWindowBounds.width),
+      height: Math.round(mainWindowBounds.height)
+    }
+
+    
+    // console.log(`main bounds: ${Object.values(mainWindowBounds)}`)
+    // console.log(`np bounds: ${Object.values(npwin.getBounds())}`)
+    // console.log(`np bounds calc: ${Object.values(npBounds)}`)
+    // console.log(`main bounds screenToDip: ${Object.values(electron.screen.screenToDipRect(mainWindow, mainWindowBounds))}`)
+    // console.log(`main bounds DipToScreen: ${Object.values(electron.screen.dipToScreenRect(mainWindow, mainWindowBounds))}`)
+    
+    
+    npwin.setBounds(npBounds)
+
+    // npBounds = npwin.getBounds()
+    
+    // console.log(`np bounds: ${Object.values(npBounds)}`)
+    // npBounds = electron.screen.dipToScreenRect(mainWindow, npBounds)
+    // console.log(`np converted bounds: ${Object.values(npBounds)}`)
+    // // npwin.setBounds(Object.assign({}, mainWindowBounds,  { x: mainWindowBounds.x + mainWindowBounds.width }))  
   })
 }
 
