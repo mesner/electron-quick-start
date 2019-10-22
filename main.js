@@ -42,7 +42,10 @@ function createWindow () {
   
   mainWindow.on('move', function() {
 
-    if(!npwin) npwin = windowManager.getWindows().find(win => win.processId==cp.pid)
+    if(!npwin) {
+      npwin = windowManager.getWindows().find(win => win.processId==cp.pid)
+      npwin.setStyle()
+    }
     
     
     let mainWindowBounds = mainWindow.getBounds()
@@ -51,12 +54,14 @@ function createWindow () {
     let scaleFactor = windowManager.getScaleFactor(mainWindowMonitor)
     
     let npBounds = {
-      x: Math.round((mainWindowBoundsScreen.x + mainWindowBoundsScreen.width) / scaleFactor),
-      y: Math.round(mainWindowBoundsScreen.y / scaleFactor),
+      x: Math.round((mainWindowBoundsScreen.x) / scaleFactor),
+      y: Math.round((mainWindowBoundsScreen.y + mainWindowBoundsScreen.height) / scaleFactor),
       width: Math.round(mainWindowBounds.width),
       height: Math.round(mainWindowBounds.height)
     }
 
+    // npwin.bringToTop();
+    
     
     // console.log(`main bounds: ${Object.values(mainWindowBounds)}`)
     // console.log(`np bounds: ${Object.values(npwin.getBounds())}`)
