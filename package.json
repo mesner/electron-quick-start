@@ -4,6 +4,7 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
+    "build-app": "cwd react-menu & npm run build & http-server build",
     "start": "electron --inspect=5858 ."
   },
   "repository": "https://github.com/electron/electron-quick-start",
