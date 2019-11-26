@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, BrowserView} = require('electron')
 const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -11,14 +11,19 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js'),
+      nativeWindowOpen: true,
+      nodeIntegration: false,
+      contextIsolation: true
     }
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-
+  //mainWindow.loadFile('index.html')
+  mainWindow.loadURL('http://localhost:8080/index.html')
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
@@ -28,6 +33,31 @@ function createWindow () {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
+  })
+  mainWindow.webContents.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
+    // if (frameName === 'modal') {
+    //   // open window as modal
+    //   event.preventDefault()
+    //   Object.assign(options, {
+    //     modal: true,
+    //     parent: mainWindow,
+    //     width: 100,
+    //     height: 100
+    //   })
+      
+    //   event.newGuest = new BrowserWindow(options)
+    // }
+
+    event.preventDefault()
+    event.newGuest = new BrowserWindow(options)
+    let view = new BrowserView({webPreferences:{affinity: "browserview"}})
+    // let view = new BrowserView()
+    event.newGuest.setBrowserView(view)
+    console.log(`options`)
+    console.dir(options, {depth:null})
+    view.setBounds({ x: 0, y: 100, width: options.width, height: options.height - 100 })
+    view.webContents.loadURL('https://google.com');
+    // view.webContents.loadURL('about:blank');
   })
 }
 
