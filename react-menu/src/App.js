@@ -1,37 +1,15 @@
 import React from 'react';
 import './App.css';
-import { StateProvider } from './StateProvider';
+import FinsembleStateProvider from './FinsembleStateProvider';
 import MainWindow from './MainWindow'
 
 
 const App = () => {
-
-  const initialState = {
-    counter: 0,
-    showWindowPortal: false,
-  };
-
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case 'incrementCounter':
-        return {
-          ...state,
-          counter: state.counter + 1
-        };
-      case 'toggleWindowPortal':
-          return {
-            ...state,
-            showWindowPortal: !state.showWindowPortal
-          }
-      default:
-        return state;
-    }
-  };
-  
+  console.log('app')
     return (
-      <StateProvider initialState={initialState} reducer={reducer}>
+      <FinsembleStateProvider>
         <MainWindow></MainWindow>
-      </StateProvider>
+      </FinsembleStateProvider>
     );
 }
 

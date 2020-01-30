@@ -49,9 +49,7 @@ const MainWindow = () => {
         getWindowLocs(6,8).map(bounds => {
         return(
           <MyWindowPortal width={bounds.width} height={bounds.height} top={bounds.top} left={bounds.left} url={"https://www.theworldsworstwebsiteever.com/"}>
-            <h1>Counter in a portal: {counter}</h1>
-            <p>Even though I render in a different window, I share state!</p>
-            
+            <p>Counter in a portal: {counter}</p>
             <button onClick={toggleWindowPortal} >
               Close me!
             </button>
