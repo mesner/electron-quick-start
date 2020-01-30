@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import './App.css';
 import { StateProvider, useStateValue } from './StateProvider';
 
-const FinsembleStateProvider = ({children}) => {
+export const FinsembleStateProvider = ({children}) => {
 
   const initialState = {
     counter: 0,
     showWindowPortal: false,
-    ready: true
+    ready: false
   };
 
   const reducer = (state, action) => {
@@ -32,23 +32,29 @@ const FinsembleStateProvider = ({children}) => {
     }
   };
 
-  
-  // const [_, dispatch] = useStateValue();
+  const WaitForFSBL = ({children}) => {
+    
+    const [state, dispatch] = useStateValue();
 
-  // useEffect(() => {
-  //   setTimeout(()=>{
-  //     console.log('dispatching finsembleReady')
-  //     dispatch({type:'finsembleReady'})
-  //   },3000)
-  // },[])
-  
-console.log(`children:${children}`)
-debugger;
+    useEffect(() => {
+      setTimeout(()=>{
+        console.log('dispatching finsembleReady')
+        dispatch({type:'finsembleReady'})
+      },5000)
+    },[dispatch])
+
+    return (
+    <div>
+      {state.ready && children}
+    </div>
+    )
+  } 
+
     return (
       <StateProvider initialState={initialState} reducer={reducer}>
-        {children}
+        <WaitForFSBL>
+          {children}
+        </WaitForFSBL>
       </StateProvider>
     );
 }
-
-export default FinsembleStateProvider;
