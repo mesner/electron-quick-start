@@ -1,12 +1,12 @@
 import React from 'react';
 import MyWindowPortal from './MyWindowPortal'
 import './App.css';
-import { useStateValue } from './StateProvider';
+import { useFinsembleState} from './store/FinsembleState';
 
 const {useEffect} = React;
 
 const MainWindow = () => {
-  const [{ counter, showWindowPortal }, dispatch] = useStateValue();
+  const [{ getCounter, getShowWindowPortal }, {incrementCounter, toggleWindowPortal}] = useFinsembleState();
 
   const getWindowLocs = (rows,cols) => {
     const height = Math.floor(window.screen.availHeight / rows);
@@ -28,24 +28,25 @@ const MainWindow = () => {
   
   useEffect(() => {
     // useEffect hook is for componentDidMount
-    window.setInterval(() => {
-      dispatch({type: 'incrementCounter'});
-    }, 1000);
-  }, [dispatch]);
+    let interval = window.setInterval(() => {
+      incrementCounter();
+    }, 1000)
+    return () => window.clearInterval(interval);
+    ;
+  }, [incrementCounter]);
     
-  const toggleWindowPortal = () => {
-    dispatch({type: 'toggleWindowPortal'});
-  }
+  const shouldShowWindowPortal = getShowWindowPortal();
+  const counter = getCounter();
   
   return (
     <div>
       <h1>Counter: {counter}</h1>
       
       <button onClick={toggleWindowPortal}>
-        {showWindowPortal ? 'Close the' : 'Open a'} Portal
+        {shouldShowWindowPortal ? 'Close the' : 'Open a'} Portal
       </button>
       
-      {showWindowPortal && (
+      {shouldShowWindowPortal && (
         getWindowLocs(6,8).map(bounds => {
         return(
           <MyWindowPortal width={bounds.width} height={bounds.height} top={bounds.top} left={bounds.left} url={"https://www.theworldsworstwebsiteever.com/"}>

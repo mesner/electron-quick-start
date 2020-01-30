@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {FinsembleStateProvider} from './FinsembleStateProvider';
+import {FinsembleStateProvider} from './store/FinsembleStateProvider';
 import MainWindow from './MainWindow'
 
 
