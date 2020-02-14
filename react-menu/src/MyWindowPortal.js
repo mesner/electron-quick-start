@@ -30,6 +30,7 @@ export default class MyWindowPortal extends React.PureComponent {
   componentDidMount() {
     // STEP 3: open a new browser window and store a reference to it
     this.externalWindow = window.open('', '', `width=${this.bounds.width},height=${this.bounds.height},left=${this.bounds.left},top=${this.bounds.top}`);
+    if(this.props.onBlur) this.externalWindow.addEventListener('blur', this.props.onBlur);
 
     // STEP 4: append the container <div> (that has props.children appended to it) to the body of the new window
     this.externalWindow.document.body.appendChild(this.containerEl);
