@@ -1,23 +1,23 @@
+const { ipcMain } = require('electron')
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, BrowserView} = require('electron')
 const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+
 let mainWindow
 
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 1000,
     frame: false,
     webPreferences: {
       sandbox: true,
       preload: path.join(__dirname, 'preload.js'),
-      nativeWindowOpen: true,
-      nodeIntegration: false,
-      contextIsolation: true
+      nodeIntegration: false
     }
   })
 
@@ -48,15 +48,15 @@ function createWindow () {
     //   event.newGuest = new BrowserWindow(options)
     // }
 
-    event.preventDefault()
-    event.newGuest = new BrowserWindow(options)
-    let view = new BrowserView({webPreferences:{affinity: "browserview"}})
-    // let view = new BrowserView()
-    event.newGuest.setBrowserView(view)
-    console.log(`options`)
-    console.dir(options, {depth:null})
-    view.setBounds({ x: 0, y: 100, width: options.width, height: options.height - 100 })
-    view.webContents.loadURL('https://google.com');
+    // event.preventDefault()
+    // event.newGuest = new BrowserWindow(options)
+    // let view = new BrowserView({webPreferences:{affinity: "browserview"}})
+    // // let view = new BrowserView()
+    // event.newGuest.setBrowserView(view)
+    // console.log(`options`)
+    // console.dir(options, {depth:null})
+    // view.setBounds({ x: 0, y: 100, width: options.width, height: options.height - 100 })
+    // view.webContents.loadURL('https://google.com');
     // view.webContents.loadURL('about:blank');
   })
 }
@@ -79,5 +79,31 @@ app.on('activate', function () {
   if (mainWindow === null) createWindow()
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+ipcMain.on('DISPATCH', (event, arg) => {
+  
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  const browserView = BrowserView.fromWebContents(event.sender);
+
+  const {type, payload} = arg;
+
+  console.log(`DISPATCHING ${type}`)
+
+  switch(type){
+    case 'BROWSERVIEW_ADD':
+      const {url, rect} = payload;
+      const bv = new BrowserView({
+        webPreferences: {
+          sandbox: true,
+          nodeIntegration: false,
+          contextIsolation: true
+        }
+      });
+      browserWindow.addBrowserView(bv);
+      bv.webContents.loadURL(url);
+      bv.setBounds(rect);
+    break;
+    default:
+    break;
+  }
+
+})

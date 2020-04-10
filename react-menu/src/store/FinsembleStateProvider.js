@@ -39,7 +39,7 @@ export const FinsembleStateProvider = ({children}) => {
       setTimeout(()=>{
         console.log('dispatching finsembleReady')
         dispatch({type:'finsembleReady'})
-      },5000)
+      },500)
     },[dispatch])
 
     return (

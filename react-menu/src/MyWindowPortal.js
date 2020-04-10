@@ -16,7 +16,6 @@ export default class MyWindowPortal extends React.PureComponent {
       height: this.props.height || 400
     };
 
-
     // STEP 1: create a container <div>
     this.containerEl = document.createElement('div');
     this.externalWindow = null;
