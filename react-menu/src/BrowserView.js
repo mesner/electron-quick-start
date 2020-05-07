@@ -18,8 +18,6 @@ const BrowserView = (params) => {
       height: targetRef.current.offsetHeight
     }
     window.FSBL.addBrowserView("https://google.com", rect);
-    rect.x = rect.x + 50;
-    window.FSBL.addBrowserView("https://google.com", rect);
   }, []);
   return (
     <div style={{width:'100%', height:'100%'}} ref={targetRef}>
